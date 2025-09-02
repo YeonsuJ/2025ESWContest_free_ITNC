@@ -42,23 +42,19 @@ Unit_controller/
 └── README_controller.md # 주요 함수 설명
 ```
 
-➡ 프로젝트 파일 바로가기
+### 프로젝트 파일 바로가기
 
 - [Unit_controller](./Unit_controller/)
-<br>
-이 프로젝트 파일은 조종기의 무선 제어 신호 송신을 담당합니다.
+<br> 이 프로젝트 파일은 조종기의 무선 제어 신호 송신을 담당합니다.
 
 - [Unit_car_central](./Unit_car_central/)
-<br>
-이 프로젝트 파일은 차량의 메인 제어부를 담당합니다. 
+<br> 이 프로젝트 파일은 차량의 메인 제어부를 담당합니다. 
 
 - [Unit_car_status](./Unit_car_status/)
-<br>
-이 프로젝트 파일은 차량의 상태 정보 관리를 담당합니다.
+<br> 이 프로젝트 파일은 차량의 상태 정보 관리를 담당합니다.
 
 - [Unit_car_sensor](./Unit_car_sensor/)
-<br>
-이 프로젝트 파일은 차량의 센서 데이터 처리를 담당합니다. 
+<br> 이 프로젝트 파일은 차량의 센서 데이터 처리를 담당합니다. 
 
 ---
 
