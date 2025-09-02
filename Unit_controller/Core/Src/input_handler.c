@@ -1,18 +1,13 @@
-// input_handler.c
-
 #include "input_handler.h"
 
-// === 내부 전용 변수들 (static으로 선언하여 외부 접근 차단) ===
 static volatile uint8_t accel_pressed = 0;
 static volatile uint8_t brake_pressed = 0;
 static volatile uint32_t accel_count = 0; // 20ms 단위 카운트
 static volatile uint32_t brake_count = 0; // 20ms 단위 카운트
 
-// === 함수 구현 ===
 
 void InputHandler_Init(void)
 {
-    // 변수 초기화
     accel_pressed = 0;
     brake_pressed = 0;
     accel_count = 0;
