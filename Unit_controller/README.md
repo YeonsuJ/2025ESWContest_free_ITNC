@@ -8,7 +8,7 @@
 
 ## 2. 주요 소스 파일 및 함수 설명 
 
-### [main.c](./Unit_controller/Core/Src/main.c)
+### [main.c](./Core/Src/main.c)
 MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케줄러를 실행합니다.
 
 - **`main()`**
@@ -17,7 +17,7 @@ MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케�
 - **`HAL_GPIO_EXTI_Callback()`** / **`HAL_TIM_PeriodElapsedCallback()`**
   - **역할**: 하드웨어 인터럽트 발생 시 호출되는 콜백 함수들입니다. GPIO 핀 인터럽트(버튼 입력, NRF24 수신)와 타이머 인터럽트(버튼 누름 시간 측정)가 발생하면, 해당 이벤트를 처리할 FreeRTOS 태스크나 관련 핸들러(`InputHandler`)에 작업을 위임합니다.
 
-### [freertos.c](./Unit_controller/Core/Src/freertos.c)
+### [freertos.c](./Core/Src/freertos.c)
 시스템의 핵심 로직을 담당하는 FreeRTOS 태스크들을 정의하고 구현합니다.
 
 - **`StartsensorTask()`**
@@ -29,7 +29,7 @@ MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케�
 - **`StartDisplayTask()`**
   - **역할**: **사용자 인터페이스 출력 태스크**입니다. 주기적으로 시스템의 상태(차량 속도, 방향, 통신 상태)를 공유 데이터 영역에서 읽어와 OLED 디스플레이에 렌더링합니다. 통신이 실패하면 "NO SIGNAL" 경고를 표시하고, 정상이면 현재 속도를 퍼센트로 변환하여 출력하는 등 모든 시각적 피드백을 담당합니다.
 
-### [input_handler.c](./Unit_controller/Core/Src/input_handler.c) / [input_handler.h](./Unit_controller/Core/Inc/input_handler.h)
+### [input_handler.c](./Core/Src/input_handler.c) / [input_handler.h](./Core/Inc/input_handler.h)
 GPIO와 타이머 인터럽트를 기반으로 사용자의 버튼 입력을 처리합니다.
 
 - **`InputHandler_Init()`**
@@ -41,7 +41,7 @@ GPIO와 타이머 인터럽트를 기반으로 사용자의 버튼 입력을 처
 - **`InputHandler_GetAccelMillis()`** / **`InputHandler_GetBrakeMillis()`**
   - **역할**: `TimerCallback`에서 누적된 카운트 값에 20을 곱하여, 버튼이 눌린 총 시간을 밀리초(ms) 단위로 계산하여 반환합니다.
 
-### [comm_handler.c](./Unit_controller/Core/Src/comm_handler.c) / [comm_handler.h](./Unit_controller/Core/Inc/comm_handler.h)
+### [comm_handler.c](./Core/Src/comm_handler.c) / [comm_handler.h](./Core/Inc/comm_handler.h)
 NRF24L01 무선 통신 모듈의 저수준(low-level) 제어를 담당합니다.
 
 - **`CommHandler_Init()`**
@@ -50,6 +50,16 @@ NRF24L01 무선 통신 모듈의 저수준(low-level) 제어를 담당합니다.
   - **역할**: 상위 태스크(`commTask`)로부터 전송할 데이터 패킷을 받아 NRF24 모듈의 하드웨어 버퍼에 쓰고, 실질적인 전송을 명령합니다.
 - **`CommHandler_CheckStatus()`**
   - **역할**: `ackHandlerTask`에 의해 호출되며, NRF24의 상태 레지스터를 읽어 마지막 통신 시도의 결과를 반환합니다. **전송 성공(TX_DS), 전송 실패(MAX_RT)** 상태를 구분하고, 성공 시에는 ACK와 함께 수신된 데이터 페이로드를 버퍼에서 읽어오는 역할까지 수행합니다.
+ 
+### [app_logic.c](./Core/Src/app_logic.c) / [app_logic.h](./Core/Inc/app_logic.h)
+데이터 패키징 및 응답신호 제어와 관련한 핵심 로직을 담당하는 함수들을 모아놓은 파일입니다.
+
+- **`App_GetRollAngle()`**
+  - **역할**: sensorTask에 의해 호출되며, mpu6050 드라이버를 사용하여 I2C 통신으로 센서의 최종 Roll 각도 값을 읽어 반환합니다.
+- **`App_BuildPacket()`**
+  - **역할**: 상위 태스크(`commTask`)로부터 전송할 데이터 패킷을 받아 NRF24 모듈의 하드웨어 버퍼에 쓰고, 실질적인 전송을 명령합니다.
+- **`App_HandleAckPayload()`**
+  - **역할**: `ackHandlerTask`에 의해 호출되며, 수신된 ACK 페이로드 데이터를 파싱하여, 햅틱 피드백을 위한 GPIO를 제어하고 DisplayTask가 사용할 공유 데이터(g_displayData)를 업데이트하는 등 후처리 작업을 수행합니다.
 
 ---
 
