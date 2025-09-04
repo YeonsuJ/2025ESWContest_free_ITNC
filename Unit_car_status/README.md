@@ -8,13 +8,13 @@
 
 ## 2. 주요 소스 파일 및 함수 설명 
 
-### [main.c](./Unit_car_status/Core/Src/main.c)
+### [main.c](./Core/Src/main.c)
 MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케줄러를 실행합니다.
 
 - **`main()`**
   - **역할**: HAL 드라이버와 시스템 클럭을 초기화하고, GPIO, CAN, I2C, ADC 등 필요한 모든 주변 장치를 설정합니다. OLED 드라이버를 초기화하고 CAN 통신 타임아웃 감지를 위한 초기 타임스탬프를 설정한 뒤, FreeRTOS 커널과 태스크를 시작시켜 시스템의 제어권을 넘깁니다.
 
-### [freertos.c](./Unit_car_status/Core/Src/freertos.c)
+### [freertos.c](./Core/Src/freertos.c)
 시스템의 핵심 로직을 담당하는 FreeRTOS 태스크들을 정의하고 구현합니다.
 
 - **`StartCANTask()`**
@@ -22,7 +22,7 @@ MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케�
 - **`StartDisplayTask()`**
   - **역할**: **사용자 인터페이스 출력 태스크**입니다. `CANTask`로부터 데이터가 수신될 때만 동작하는 이벤트 기반 태스크입니다. 데이터 수신 즉시 LED 상태를 업데이트하여 즉각적인 피드백을 제공하고, 50ms 주기로 OLED 디스플레이에 배터리 잔량 및 전체 통신 상태를 출력합니다.
 
-### [can_handler.c](./Unit_car_status/Core/Src/can_handler.c) / [can_handler.h](./Unit_car_status/Core/Inc/can_handler.h)
+### [can_handler.c](./Core/Src/can_handler.c) / [can_handler.h](./Core/Inc/can_handler.h)
 CAN 통신의 초기 설정과 하드웨어 인터럽트 처리를 담당합니다.
 
 - **`CANHandler_Init()`**
@@ -32,13 +32,13 @@ CAN 통신의 초기 설정과 하드웨어 인터럽트 처리를 담당합니�
 - **`HAL_CAN_RxFifo1MsgPendingCallback()`**
   - **역할**: CAN 메시지 수신 시 하드웨어적으로 호출되는 **인터럽트 서비스 루틴(ISR)**입니다. 수신된 메시지를 하드웨어 버퍼에서 읽어 FreeRTOS 메시지 큐(`CANRxQueueHandle`)에 안전하게 전달하는 역할만 수행합니다.
 
-### [led_control.c](./Unit_car_status/Core/Src/led_control.c) / [led_control.h](./Unit_car_status/Core/Inc/led_control.h)
+### [led_control.c](./Core/Src/led_control.c) / [led_control.h](./Core/Inc/led_control.h)
 차량의 LED 점등을 제어하는 간단한 인터페이스를 제공합니다.
 
 - **`LEDControl_Update()`**
   - **역할**: 조도(`ldr`), 방향(`direction`), 브레이크(`brake`) 상태 값을 인자로 받아 차량의 모든 LED 상태를 갱신합니다. 함수 호출 시 먼저 모든 LED를 끈 다음, 입력된 조건에 맞는 전조등과 브레이크등을 다시 점등시킵니다.
 
-### [oled_display.c](./Unit_car_status/Core/Src/oled_display.c) / [oled_display.h](./Unit_car_status/Core/Inc/oled_display.h)
+### [oled_display.c](./Core/Src/oled_display.c) / [oled_display.h](./Core/Inc/oled_display.h)
 I2C 통신 기반의 OLED 디스플레이 출력을 관리합니다.
 
 - **`OLED_Init()`**
@@ -46,7 +46,7 @@ I2C 통신 기반의 OLED 디스플레이 출력을 관리합니다.
 - **`OLED_UpdateDisplay()`**
   - **역할**: 배터리 잔량, 전압, CAN 및 RF 통신 상태를 인자로 받아 화면 전체를 새로 그립니다. 통신이 실패하면 "CAN FAIL", "RF FAIL"과 같은 경고 메시지를 표시하고, 통신이 정상이면 배터리 정보를 표시합니다.
 
-### [battery_monitor.c](./Unit_car_status/Core/Src/battery_monitor.c) / [battery_monitor.h](./Unit_car_status/Core/Inc/battery_monitor.h)
+### [battery_monitor.c](./Core/Src/battery_monitor.c) / [battery_monitor.h](./Core/Inc/battery_monitor.h)
 ADC를 사용하여 보드의 배터리 전압을 측정하고 관리합니다.
 
 - **`Read_Battery_Percentage()`**
