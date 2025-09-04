@@ -8,13 +8,13 @@
 
 ## 2. 주요 소스 파일 및 함수 설명
 
-### [main.c](./Unit_car_sensor/Core/Src/main.c)
+### [main.c](./Core/Src/main.c)
 MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케줄러를 실행합니다.
 
 - **`main()`**
     - **역할**: HAL 드라이버와 시스템 클럭을 초기화하고, GPIO, CAN, 및 센서 구동에 필요한 모든 타이머(TIM1-Encoder, TIM2/4-Ultrasonic)를 설정합니다. RPM의 정밀한 시간 측정을 위한 `DWT_Init`를 호출한 뒤, FreeRTOS 커널과 태스크를 시작시켜 시스템의 제어권을 넘깁니다.
 
-### [freertos.c](./Unit_car_sensor/Core/Src/freertos.c)
+### [freertos.c](./Core/Src/freertos.c)
 시스템의 핵심 로직을 담당하는 FreeRTOS 태스크들을 정의하고 구현합니다.
 
 - **`StartSensorTask()`**
@@ -22,7 +22,7 @@ MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케�
 - **`StartCANTask()`**
     - **역할**: **데이터 가공 및 전송 태스크**입니다. `SensorTask`로부터 데이터가 수신될 때만 동작하는 이벤트 기반 태스크입니다. 데이터를 수신하면 CAN 프로토콜에 맞게 가공(거리→비트마스크, RPM→2바이트 분리)하고 `TxData` 버퍼에 저장한 뒤, `CAN_Send()`를 호출하여 전송합니다.
 
-### [can_handler.c](./Unit_car_sensor/Core/Src/can_handler.c) / [can_handler.h](./Unit_car_sensor/Core/Inc/can_handler.h)
+### [can_handler.c](./Core/Src/can_handler.c) / [can_handler.h](./Core/Inc/can_handler.h)
 CAN 통신의 초기 설정과 데이터 전송 기능을 담당합니다.
 
 - **`CAN_tx_Init()`**
@@ -30,7 +30,7 @@ CAN 통신의 초기 설정과 데이터 전송 기능을 담당합니다.
 - **`CAN_Send()`**
     - **역할**: `CANTask`에 의해 가공된 데이터가 저장된 `TxData` 버퍼의 내용을 CAN 버스를 통해 물리적으로 전송합니다.
 
-### [motor_encoder.c](./Unit_car_sensor/Core/Src/motor_encoder.c) / [motor_encoder.h](./Unit_car_sensor/Core/Inc/motor_encoder.h)
+### [motor_encoder.c](./Core/Src/motor_encoder.c) / [motor_encoder.h](./Core/Inc/motor_encoder.h)
 타이머 엔코더 모드를 사용하여 모터의 RPM을 측정합니다.
 
 - **`DWT_Init()`**
@@ -40,7 +40,7 @@ CAN 통신의 초기 설정과 데이터 전송 기능을 담당합니다.
 - **`MotorControl_GetRPM()`**
     - **역할**: `SensorTask`에서 최종적으로 필터링된 RPM 값을 조회할 때 사용하는 Getter 함수입니다.
 
-### [ultrasonic.c](./Unit_car_sensor/Core/Src/ultrasonic.c) / [ultrasonic.h](./Unit_car_sensor/Core/Inc/ultrasonic.h)
+### [ultrasonic.c](./Core/Src/ultrasonic.c) / [ultrasonic.h](./Core/Inc/ultrasonic.h)
 타이머 입력 캡처(Input Capture)를 이용해 초음파 센서의 거리를 측정합니다.
 
 - **`Ultrasonic_Init()`**
