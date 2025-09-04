@@ -8,13 +8,13 @@
 
 ## 2. 주요 소스 파일 및 함수 설명
 
-### [main.c](./Unit_car_central/Core/Src/main.c)
+### [main.c](./Core/Src/main.c)
 MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케줄러를 실행합니다.
 
 - **`main()`**
   - **역할**: HAL 드라이버와 시스템 클럭을 초기화하고, GPIO, CAN, SPI, TIM 등 필요한 모든 주변 장치를 설정합니다. RFHandler, CANHandler, MotorControl 등 각 기능 모듈을 초기화한 뒤, FreeRTOS 커널과 태스크를 시작시켜 시스템의 제어권을 넘깁니다.
 
-### [freertos.c](./Unit_car_central/Core/Src/freertos.c)
+### [freertos.c](./Core/Src/freertos.c)
 시스템의 핵심 로직을 담당하는 FreeRTOS 태스크들을 정의하고 구현합니다.
 
 - **`StartRFTask()`**
@@ -22,7 +22,7 @@ MCU의 시작점(Entry Point)으로, 하드웨어 초기화 및 FreeRTOS 스케�
 - **`StartCANTask()`**
   - **역할**: **CAN 게이트웨이 및 상태 전파 태스크**입니다. RFTask로부터 차량의 주행 상태를 전달받을 때만 동작하며, 해당 정보를 CAN 버스를 통해 다른 ECU로 브로드캐스팅하는 역할을 담당합니다.
 
-### [can_handler.c](./Unit_car_central/Core/Src/can_handler.c) / [can_handler.h](./Unit_car_central/Core/Inc/can_handler.h)
+### [can_handler.c](./Core/Src/can_handler.c) / [can_handler.h](./Core/Inc/can_handler.h)
 CAN 통신의 초기 설정과 하드웨어 인터럽트 처리를 담당합니다.
 
 - **`CANHandler_Init()`**
@@ -34,7 +34,7 @@ CAN 통신의 초기 설정과 하드웨어 인터럽트 처리를 담당합니�
 - **CAN_Send_DriveStatus()**
   - **역할**: 차량의 현재 상태(방향, 브레이크, RF 상태)를 인자로 받아 CAN 프레임으로 패키징한 후, CAN 버스로 전송합니다.
 
-### [rf_handler.c](./Unit_car_central/Core/Src/rf_handler.c) / [rf_handler.h](./Unit_car_central/Core/Inc/rf_handler.h)
+### [rf_handler.c](./Core/Src/rf_handler.c) / [rf_handler.h](./Core/Inc/rf_handler.h)
 NRF24L01+ 모듈을 이용한 조종기와의 RF 통신을 관리합니다.
 
 - **`RFHandler_Init()`**
@@ -46,7 +46,7 @@ NRF24L01+ 모듈을 이용한 조종기와의 RF 통신을 관리합니다.
 - **`RFHandler_IrqCallback()`**
   - **역할**: RF 모듈의 IRQ 핀 인터럽트 발생 시 호출되어, 대기 중인 RFTask를 깨우기 위해 세마포어를 반환하는 신호 역할을 합니다.
 
-### [motor_control.c](./Unit_car_central/Core/Src/motor_control.c) / [motor_control.h](./Unit_car_central/Core/Inc/motor_control.h)
+### [motor_control.c](./Core/Src/motor_control.c) / [motor_control.h](./Core/Inc/motor_control.h)
 차량의 물리적 구동(모터, 서보)을 직접 제어하는 인터페이스를 제공합니다.
 
 - **`MotorControl_Init()`**
